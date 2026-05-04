@@ -1,10 +1,10 @@
 from .base import Sensor
+from .motion import MotionSensor
 from typing import Any
 
-
-# Register sensors here as you add them.
-# Each entry maps a sensor_id to a Sensor instance.
-_registry: dict[str, Sensor] = {}
+_registry: dict[str, Sensor] = {
+    "motion": MotionSensor(),
+}
 
 
 def register(sensor_id: str, sensor: Sensor) -> None:
