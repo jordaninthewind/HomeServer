@@ -1,3 +1,4 @@
+import threading
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
@@ -29,6 +30,19 @@ def create_app():
                 save_snapshot(frame, config.SNAPSHOT_DIR)
 
         motion.on_trigger(_save_motion_snapshot)
+
+    def _timelapse_loop():
+        import time
+        from .camera import Camera
+        from .utils import save_snapshot
+        while True:
+            time.sleep(config.TIMELAPSE_INTERVAL)
+            frame = Camera().snapshot()
+            if frame:
+                save_snapshot(frame, config.SNAPSHOT_DIR, prefix="timelapse")
+
+    t = threading.Thread(target=_timelapse_loop, daemon=True)
+    t.start()
 
     @socketio.on("connect")
     def on_connect():
