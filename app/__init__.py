@@ -1,9 +1,12 @@
+import logging
 import threading
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from .routes import health, sensors, stream
 import config
+
+logger = logging.getLogger(__name__)
 
 socketio = SocketIO(async_mode="threading", cors_allowed_origins="*")
 
@@ -35,11 +38,19 @@ def create_app():
         import time
         from .camera import Camera
         from .utils import save_snapshot
+        # warm up the camera before entering the interval loop
+        Camera()
         while True:
             time.sleep(config.TIMELAPSE_INTERVAL)
-            frame = Camera().snapshot()
-            if frame:
-                save_snapshot(frame, config.SNAPSHOT_DIR, prefix="timelapse")
+            try:
+                frame = Camera().snapshot(timeout=5.0)
+                if frame is None:
+                    logger.warning("timelapse: snapshot returned no frame")
+                    continue
+                path = save_snapshot(frame, config.SNAPSHOT_DIR, prefix="timelapse")
+                logger.info("timelapse: saved %s", path)
+            except Exception:
+                logger.exception("timelapse: error saving snapshot")
 
     t = threading.Thread(target=_timelapse_loop, daemon=True)
     t.start()
