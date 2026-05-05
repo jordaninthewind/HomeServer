@@ -15,7 +15,7 @@ def _mjpeg_frames():
 
 
 @bp.get("/video")
-def video_feed():
+def video_feed():       
     return Response(
         _mjpeg_frames(),
         mimetype="multipart/x-mixed-replace; boundary=frame",

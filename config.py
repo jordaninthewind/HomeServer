@@ -11,3 +11,5 @@ CAMERA_HEIGHT = int(os.getenv("CAMERA_HEIGHT", 720))
 CAMERA_FPS = int(os.getenv("CAMERA_FPS", 30))
 
 MOTION_SENSOR_PIN = int(os.getenv("MOTION_SENSOR_PIN", 17))
+
+SNAPSHOT_DIR = os.getenv("SNAPSHOT_DIR", "snapshots")

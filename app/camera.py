@@ -62,6 +62,13 @@ class Camera:
             self._condition.wait()
             return self._frame
 
+    def snapshot(self, timeout: float = 2.0) -> bytes | None:
+        with self._condition:
+            if self._frame is not None:
+                return self._frame
+            self._condition.wait(timeout)
+            return self._frame
+
     def stop(self) -> None:
         self._proc.terminate()
         self._proc.wait()

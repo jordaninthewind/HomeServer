@@ -2,6 +2,7 @@ from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from .routes import health, sensors, stream
+import config
 
 socketio = SocketIO(async_mode="threading", cors_allowed_origins="*")
 
@@ -19,6 +20,15 @@ def create_app():
     motion = _registry.get("motion")
     if motion:
         motion.on_trigger(lambda data: socketio.emit("motion", data))
+
+        def _save_motion_snapshot(_data):
+            from .camera import Camera
+            from .utils import save_snapshot
+            frame = Camera().snapshot()
+            if frame:
+                save_snapshot(frame, config.SNAPSHOT_DIR)
+
+        motion.on_trigger(_save_motion_snapshot)
 
     @socketio.on("connect")
     def on_connect():
