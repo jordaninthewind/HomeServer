@@ -1,0 +1,12 @@
+{
+    "exec": "python3 run.py",
+    "ext": "py,html,css,js,json",
+    "env": {
+        "FLASK_ENV": "development",
+        "FLASK_DEBUG": "1"
+    },
+    "ignore": [
+        "*.pyc",
+        "__pycache__"
+    ]
+}
